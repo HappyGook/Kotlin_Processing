@@ -156,7 +156,7 @@ abstract class Form {
      * @param scale Aktueller Skalierungsfaktor
      * @return Den aktiven ResizeHandle oder null, wenn keiner aktiv ist
      */
-    fun getResizeHandle(mouseX: Float, mouseY: Float, scale: Float): ResizeHandle? {
+    open fun getResizeHandle(mouseX: Float, mouseY: Float, scale: Float): ResizeHandle? {
         val bounds = getBounds()
         val mouseXScaled = mouseX / scale
         val mouseYScaled = mouseY / scale
@@ -174,7 +174,7 @@ abstract class Form {
      * Prüft, ob sich die Maus über einem Größenänderungsgriff befindet.
      *
     */
-    private fun isOverHandle(mouseX: Float, mouseY: Float, handleX: Float, handleY: Float): Boolean {
+     fun isOverHandle(mouseX: Float, mouseY: Float, handleX: Float, handleY: Float): Boolean {
         return mouseX >= handleX - handleSize/2 &&
                 mouseX <= handleX + handleSize/2 &&
                 mouseY >= handleY - handleSize/2 &&

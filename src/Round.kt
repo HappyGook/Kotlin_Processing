@@ -52,7 +52,7 @@ internal class Round : Form {
 
     /**
      * Verbesserte Bounds-Funktion,
-     * die richtig quadratische Grenzen eines Kreises berechnet
+     * die richtig runde Grenzen eines Kreises berechnet
      */
 
     override fun getBounds(): Bounds {
@@ -62,6 +62,69 @@ internal class Round : Form {
             y,
             y + radius * 2
         )
+    }
+
+    /**
+     * Override isMouseOver, weil Runde Selektion nötig
+     */
+
+
+    override fun isMouseOver(mouseX: Float, mouseY: Float, scale: Float): Boolean {
+        val mouseXScaled = mouseX / scale
+        val mouseYScaled = mouseY / scale
+
+        val centerX = x + radius
+        val centerY = y + radius
+        val distance = kotlin.math.sqrt(
+            (mouseXScaled - centerX) * (mouseXScaled - centerX) +
+                    (mouseYScaled - centerY) * (mouseYScaled - centerY)
+        )
+
+        return distance <= radius
+    }
+
+    /**
+    * Auch override, damit die runde Grenze angezeigt wird
+     */
+    override fun drawSelectionHighlight() {
+        processing.apply{
+            pushStyle()
+            noFill()
+            stroke(0f,0f,255f)
+            strokeWeight(1f)
+
+            circle(x + radius, y + radius, radius * 2)
+
+            fill(255f)
+            stroke(0f,0f,255f)
+            strokeWeight(1f)
+
+            rect(x + radius - handleSize/2, y - handleSize/2, handleSize, handleSize)
+            rect(x + radius * 2 - handleSize/2, y + radius - handleSize/2, handleSize, handleSize)
+            rect(x + radius - handleSize/2, y + radius * 2 - handleSize/2, handleSize, handleSize)
+            rect(x - handleSize/2, y + radius - handleSize/2, handleSize, handleSize)
+
+            popStyle()
+        }
+    }
+
+    override fun getResizeHandle(mouseX: Float, mouseY: Float, scale: Float): ResizeHandle? {
+        val mouseXScaled = mouseX / scale
+        val mouseYScaled = mouseY / scale
+
+        val centerX = x + radius
+        val centerY = y + radius
+        return when {
+            // Top handle
+            isOverHandle(mouseXScaled, mouseYScaled, centerX, y) -> ResizeHandle.TOP_LEFT
+            // Right handle
+            isOverHandle(mouseXScaled, mouseYScaled, x + radius * 2, centerY) -> ResizeHandle.TOP_RIGHT
+            // Bottom handle
+            isOverHandle(mouseXScaled, mouseYScaled, centerX, y + radius * 2) -> ResizeHandle.BOTTOM_RIGHT
+            // Left handle
+            isOverHandle(mouseXScaled, mouseYScaled, x, centerY) -> ResizeHandle.BOTTOM_LEFT
+            else -> null
+        }
     }
 
     /**
