@@ -100,6 +100,30 @@ class FormManager(private val processing: PApplet) {
         }
     }
 
+    /**
+     * Behandelt Maus scrollen, um die Größe ausgewählten Formen zu verändern.
+     *
+     * @param delta The amount to resize by (positive for increase, negative for decrease)
+     */
+    fun handleScroll(delta: Float) {
+        selectedForms.forEach { form ->
+            when (form) {
+                is Round -> {
+                    form.radius = (form.radius + delta).coerceAtLeast(10f)
+                }
+                is Square -> {
+                    form.side = (form.side + delta).coerceAtLeast(20f)
+                }
+                is Rectangle -> {
+                    val aspectRatio = form.sideB / form.sideA
+                    form.sideA = (form.sideA + delta).coerceAtLeast(20f)
+                    form.sideB = form.sideA * aspectRatio
+                }
+            }
+        }
+    }
+
+
 
     /**
      * Verarbeitet das Loslassen der Maustaste.

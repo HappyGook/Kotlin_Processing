@@ -104,6 +104,20 @@ class Main : PApplet() {
     override fun mouseReleased() {
         formManager.handleMouseRelease()
     }
+    /**
+     * Behandelt das Scrollen.
+     * Überprüft, in welcher Richtung gescrollt wird und davon abhängig wird Delta positiv oder negativ.
+     */
+    override fun mouseWheel(event: processing.event.MouseEvent) {
+        val scaleX = width.toFloat() / window_width
+        val scaleY = height.toFloat() / window_height
+        val scale = minOf(scaleX, scaleY)
+
+        val delta = if (event.count > 0) 5f else -5f
+
+        formManager.handleScroll(delta)
+    }
+
 
     override fun draw() {
         background(240)
