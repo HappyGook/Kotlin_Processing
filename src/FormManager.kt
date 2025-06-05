@@ -1,11 +1,16 @@
 import processing.core.PApplet
-import kotlin.math.abs
 
 /**
  * Verwaltet die Formen in der Anwendung.
- * Diese Klasse ist verantwortlich für die Erstellung, Verwaltung und Manipulation von Formen.
+ * Diese Klasse ist verantwortlich für die Erstellung, Verwaltung und Manipulation von geometrischen Formen.
+ *
+ * @property processing Die Processing-Instanz für Zeichenoperationen
+ * @property forms Liste aller Formen in der Anwendung
+ * @property selectedForms Menge der aktuell ausgewählten Formen
+ * @property activeResizeHandle Aktiver Größenänderungsgriff, falls vorhanden
+ * @property resizingForm Form, die gerade in der Größe verändert wird
+ * @property draggingForm Form, die gerade gezogen wird
  */
-
 class FormManager(private val processing: PApplet) {
     private val forms = mutableListOf<Form?>()
     private val selectedForms = mutableSetOf<Form>()
@@ -13,6 +18,11 @@ class FormManager(private val processing: PApplet) {
     private var resizingForm: Form? = null
     private var draggingForm: Form? = null
 
+    /**
+     * Erstellt eine neue Form
+     * @param type Typ der zu erstellenden Form ('k' für Kreis, 'q' für Quadrat, 'v' für Rechteck)
+     * @return Die erstellte Form oder null, wenn der Typ nicht erkannt wurde
+     */
     fun createForm(type: Char): Form? {
         val newForm = when (type) {
             'k' -> Round(processing)
@@ -26,6 +36,15 @@ class FormManager(private val processing: PApplet) {
         return newForm
     }
 
+    /**
+     * Verarbeitet das Drücken der Maustaste.
+     * Prüft, ob eine Form getroffen wurde und handhabt die Auswahl sowie die Initiierung von
+     * Größenänderungs- oder Bewegungsoperationen.
+     *
+     * @param mouseX X-Koordinate der Maus
+     * @param mouseY Y-Koordinate der Maus
+     * @param scale Aktueller Skalierungsfaktor des Fensters
+     */
     fun handleMousePress(mouseX: Float, mouseY: Float, scale: Float) {
         val clickedForm = forms.findLast { it?.isMouseOver(mouseX, mouseY, scale) == true }
 
@@ -59,13 +78,21 @@ class FormManager(private val processing: PApplet) {
         }
     }
 
+    /**
+     * Verarbeitet Mausbewegungen während des Ziehens.
+     * Handhabt sowohl das Verschieben als auch die Größenänderung von Formen.
+     *
+     * @param dx Horizontale Bewegung der Maus
+     * @param dy Vertikale Bewegung der Maus
+     * @param mouseX Aktuelle X-Position der Maus
+     * @param mouseY Aktuelle Y-Position der Maus
+     * @param scale Aktueller Skalierungsfaktor
+     * @param windowWidth Fensterbreite
+     * @param windowHeight Fensterhöhe
+     */
     fun handleDrag(dx: Float, dy: Float, mouseX: Float, mouseY: Float, scale: Float, windowWidth: Int, windowHeight: Int) {
         if (resizingForm != null && activeResizeHandle != null) {
-            when (resizingForm) {
-                is Rectangle -> handleRectangleResize(resizingForm as Rectangle, dx, dy)
-                is Square -> handleSquareResize(resizingForm as Square, dx, dy)
-                is Round -> handleRoundResize(resizingForm as Round, dx, dy)
-            }
+            resizingForm?.resize(activeResizeHandle!!, dx, dy)
             resizingForm?.constrainToWindow(windowWidth, windowHeight)
         } else if (draggingForm != null) {
             draggingForm?.onDrag(dx, dy)
@@ -73,6 +100,12 @@ class FormManager(private val processing: PApplet) {
         }
     }
 
+
+    /**
+     * Verarbeitet das Loslassen der Maustaste.
+     * Beendet laufende Größenänderungs- oder Bewegungsoperationen und
+     * aktualisiert die Formauswahl bei einfachen Klicks.
+     */
     fun handleMouseRelease() {
         if (resizingForm == null && draggingForm == null) {
             // Clicked without dragging or resizing
@@ -92,107 +125,46 @@ class FormManager(private val processing: PApplet) {
         draggingForm = null
     }
 
+    /**
+     * Passt die Farbe der ausgewählten Formen an.
+     *
+     * @param component Farbkomponente ('r' für Rot, 'g' für Grün, 'b' für Blau)
+     * @param increase True für Erhöhung, False für Verringerung der Farbkomponente
+     */
     fun adjustSelectedFormsColor(component: Char, increase: Boolean) {
         selectedForms.forEach { it.adjustColor(component, increase) }
     }
 
+    /**
+     * Ändert die Randbreite der ausgewählten Formen.
+     *
+     * @param component Neue Randbreite (0-9)
+     */
     fun adjustSelectedFormsBorder(component: Float){
         selectedForms.forEach { it.adjustBorder(component) }
     }
 
+    /**
+     * Zeichnet alle Formen und markiert die ausgewählten Formen.
+     *
+     * @param scale Aktueller Skalierungsfaktor für die korrekte Darstellung
+     */
     fun drawForms(scale: Float) {
         forms.forEach { it?.draw() }
         selectedForms.forEach { it.drawSelectionHighlight() }
     }
 
+    /**
+     * Entfernt ausgewählte Formen aus der Anwendung.
+     */
     fun removeSelectedForms() {
         forms.removeAll { it in selectedForms }
         selectedForms.clear()
     }
-    private fun handleRectangleResize(rectangle: Rectangle, dx: Float, dy: Float) {
-        when (activeResizeHandle) {
-            Form.ResizeHandle.BOTTOM_RIGHT -> {
-                rectangle.side_a = (rectangle.side_a + dx).coerceAtLeast(20f)
-                rectangle.side_b = (rectangle.side_b + dy).coerceAtLeast(20f)
-            }
-            Form.ResizeHandle.BOTTOM_LEFT -> {
-                val oldWidth = rectangle.side_a
-                rectangle.side_a = (rectangle.side_a - dx).coerceAtLeast(20f)
-                rectangle.x += oldWidth - rectangle.side_a
-                rectangle.side_b = (rectangle.side_b + dy).coerceAtLeast(20f)
-            }
-            Form.ResizeHandle.TOP_RIGHT -> {
-                rectangle.side_a = (rectangle.side_a + dx).coerceAtLeast(20f)
-                val oldHeight = rectangle.side_b
-                rectangle.side_b = (rectangle.side_b - dy).coerceAtLeast(20f)
-                rectangle.y += oldHeight - rectangle.side_b
-            }
-            Form.ResizeHandle.TOP_LEFT -> {
-                val oldWidth = rectangle.side_a
-                val oldHeight = rectangle.side_b
-                rectangle.side_a = (rectangle.side_a - dx).coerceAtLeast(20f)
-                rectangle.side_b = (rectangle.side_b - dy).coerceAtLeast(20f)
-                rectangle.x += oldWidth - rectangle.side_a
-                rectangle.y += oldHeight - rectangle.side_b
-            }
-            null -> {}
-        }
-    }
-    private fun handleSquareResize(square: Square, dx: Float, dy: Float) {
 
-        val delta = maxOf(abs(dx), abs(dy)) * if (dx + dy > 0) 1 else -1
-
-        when (activeResizeHandle) {
-            Form.ResizeHandle.BOTTOM_RIGHT -> {
-                square.side = (square.side + delta).coerceAtLeast(20f)
-            }
-            Form.ResizeHandle.BOTTOM_LEFT -> {
-                val oldSize = square.side
-                square.side = (square.side - delta).coerceAtLeast(20f)
-                square.x += oldSize - square.side
-            }
-            Form.ResizeHandle.TOP_RIGHT -> {
-                val oldSize = square.side
-                square.side = (square.side + delta).coerceAtLeast(20f)
-                square.y -= square.side - oldSize
-            }
-            Form.ResizeHandle.TOP_LEFT -> {
-                val oldSize = square.side
-                square.side = (square.side - delta).coerceAtLeast(20f)
-                square.x += oldSize - square.side
-                square.y += oldSize - square.side
-            }
-            null -> {}
-        }
-    }
-    private fun handleRoundResize(round: Round, dx: Float, dy: Float) {
-
-        val delta = maxOf(abs(dx), abs(dy)) * if (dx + dy > 0) 1 else -1
-
-        when (activeResizeHandle) {
-            Form.ResizeHandle.BOTTOM_RIGHT -> {
-                round.radius = (round.radius + delta/2).coerceAtLeast(10f)
-            }
-            Form.ResizeHandle.BOTTOM_LEFT -> {
-                val oldDiameter = round.radius * 2
-                round.radius = (round.radius - delta/2).coerceAtLeast(10f)
-                round.x += oldDiameter - round.radius * 2
-            }
-            Form.ResizeHandle.TOP_RIGHT -> {
-                val oldDiameter = round.radius * 2
-                round.radius = (round.radius + delta/2).coerceAtLeast(10f)
-                round.y -= round.radius * 2 - oldDiameter
-            }
-            Form.ResizeHandle.TOP_LEFT -> {
-                val oldDiameter = round.radius * 2
-                round.radius = (round.radius - delta/2).coerceAtLeast(10f)
-                round.x += oldDiameter - round.radius * 2
-                round.y += oldDiameter - round.radius * 2
-            }
-            null -> {}
-        }
-    }
-
+    /**
+     * Größenänderungen den verschiedenen Formen.
+     */
 }
 
 

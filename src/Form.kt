@@ -38,6 +38,12 @@ abstract class Form {
         this.fillColor = getRandomColor(processing)
     }
 
+    /**
+    * Prüft, ob sich der Mauszeiger über der Form befindet.
+    * Berücksichtigt den aktuellen Skalierungsfaktor des Fensters.
+    *
+    * @return true, wenn Maus über der Form ist, sonst false
+    */
     open fun isMouseOver(mouseX: Float, mouseY: Float, scale: Float): Boolean {
         val bounds = getBounds()
         val mouseXScaled = mouseX / scale
@@ -49,12 +55,24 @@ abstract class Form {
                 mouseYScaled <= bounds.bottom
     }
 
+    /**
+     * Behandelt das Ziehen der Form mit der Maus.
+     * Aktualisiert die Position der Form basierend auf der Mausbewegung.
+     *
+     * @param dx Horizontale Bewegung
+     * @param dy Vertikale Bewegung
+     */
     open fun onDrag(dx: Float, dy: Float) {
         x += dx
         y += dy
     }
 
-
+    /**
+     * Beschränkt die Position der Form auf den sichtbaren Fensterbereich.
+     *
+     * @param windowWidth Breite des Fensters
+     * @param windowHeight Höhe des Fensters
+     */
     open fun constrainToWindow(windowWidth: Int, windowHeight: Int) {
         val bounds = getBounds()
         val width = bounds.right - bounds.left
@@ -65,7 +83,10 @@ abstract class Form {
         y = y.coerceIn(0f, (windowHeight - height).coerceAtLeast(0f))
     }
 
-
+    /**
+     * Zeichnet die Auswahlhervorhebung um die Form.
+     * Zeigt einen blauen Rahmen und Griffe an den Ecken.
+     */
     protected val handleSize = 8f
     open fun drawSelectionHighlight() {
         processing.apply {
@@ -99,6 +120,12 @@ abstract class Form {
         }
     }
 
+    /**
+     * Passt die Farbe der Form an.
+     *
+     * @param component Farbkomponente ('r', 'g' oder 'b')
+     * @param increase True für Erhöhung, False für Verringerung der Komponente
+     */
     fun adjustColor(component: Char, increase: Boolean) {
         val r = processing.red(fillColor)
         val g = processing.green(fillColor)
@@ -114,10 +141,21 @@ abstract class Form {
         }
     }
 
+    /**
+     * Setzt die Breite des Rands.
+     */
     fun adjustBorder(component: Float) {
         borderWidth = component
     }
 
+    /**
+     * Ermittelt den aktiven Griff an der Mausposition.
+     *
+     * @param mouseX X-Koordinate der Maus
+     * @param mouseY Y-Koordinate der Maus
+     * @param scale Aktueller Skalierungsfaktor
+     * @return Den aktiven ResizeHandle oder null, wenn keiner aktiv ist
+     */
     fun getResizeHandle(mouseX: Float, mouseY: Float, scale: Float): ResizeHandle? {
         val bounds = getBounds()
         val mouseXScaled = mouseX / scale
@@ -132,6 +170,10 @@ abstract class Form {
         }
     }
 
+    /**
+     * Prüft, ob sich die Maus über einem Größenänderungsgriff befindet.
+     *
+    */
     private fun isOverHandle(mouseX: Float, mouseY: Float, handleX: Float, handleY: Float): Boolean {
         return mouseX >= handleX - handleSize/2 &&
                 mouseX <= handleX + handleSize/2 &&
@@ -139,6 +181,9 @@ abstract class Form {
                 mouseY <= handleY + handleSize/2
     }
 
+    /**
+     * Aufzählung der möglichen Griffe.
+     */
     enum class ResizeHandle {
         TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT
     }
@@ -162,6 +207,16 @@ abstract class Form {
         println("X-Coordinate: $x,\nY-Coordinate: $y,\nArea: ${countArea()}")
     }
 
+    /**
+     * Abstrakte Methode zur Größenänderung des Forms.
+     *
+     * @param handle Der aktive Größenänderungsgriff
+     * @param dx Horizontale Änderung
+     * @param dy Vertikale Änderung
+     */
+    abstract fun resize(handle: ResizeHandle, dx: Float, dy: Float)
+
+
     private fun getRandomColor(p: PApplet): Int {
         return p.color(
             Random.nextInt(256),
@@ -172,7 +227,20 @@ abstract class Form {
 
     abstract fun draw()
 
+    /**
+     * Ein Companion Object für klassenweite Hilfsfunktionen und Konstanten.
+     * Statische Funktionalität, die von allen Formen gemeinsam genutzt wird,
+     * ohne dass eine Instanz der Form erstellt werden muss.
+     */
     companion object {
+        /**
+         * Hilfsfunktion zur Erzeugung von RGB-Farben.
+         *
+         * @param r Rotwert (0-255)
+         * @param g Grünwert (0-255)
+         * @param b Blauwert (0-255)
+         * @return Kombinierter RGB-Farbwert
+         */
         fun color(r: Int, g: Int, b: Int): Int {
             return (r shl 16) or (g shl 8) or b
         }

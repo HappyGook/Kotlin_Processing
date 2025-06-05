@@ -1,4 +1,5 @@
 import processing.core.PApplet
+import kotlin.math.abs
 import kotlin.random.Random
 
 /**
@@ -31,7 +32,7 @@ internal class Round : Form {
     }
 
     /**
-     * Zeichnet den Kreis im Processing-Fenster
+     * Zeichnet den Kreis im Processing-Fenster.
      * Zentrum des Kreises wird verschoben, um bessere Bounds zu erhalten.
      */
     override fun draw() {
@@ -63,5 +64,33 @@ internal class Round : Form {
         )
     }
 
+    /**
+     *  Überschriebene Methode zur Größenänderung.
+     *
+     */
+    override fun resize(handle: ResizeHandle, dx: Float, dy: Float) {
+        val delta = maxOf(abs(dx), abs(dy)) * if (dx + dy > 0) 1 else -1
 
+        when (handle) {
+            ResizeHandle.BOTTOM_RIGHT -> {
+                radius = (radius + delta/2).coerceAtLeast(10f)
+            }
+            ResizeHandle.BOTTOM_LEFT -> {
+                val oldDiameter = radius * 2
+                radius = (radius - delta/2).coerceAtLeast(10f)
+                x += oldDiameter - radius * 2
+            }
+            ResizeHandle.TOP_RIGHT -> {
+                val oldDiameter = radius * 2
+                radius = (radius + delta/2).coerceAtLeast(10f)
+                y -= radius * 2 - oldDiameter
+            }
+            ResizeHandle.TOP_LEFT -> {
+                val oldDiameter = radius * 2
+                radius = (radius - delta/2).coerceAtLeast(10f)
+                x += oldDiameter - radius * 2
+                y += oldDiameter - radius * 2
+            }
+        }
+    }
 }

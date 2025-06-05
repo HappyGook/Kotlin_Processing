@@ -5,16 +5,16 @@ import kotlin.random.Random
  * Repräsentiert ein Rechteck.
  */
 internal open class Rectangle : Form {
-    var side_a = 0.0f
-    var side_b = 0.0f
+    var sideA = 0.0f
+    var sideB = 0.0f
 
     /**
      * Konstruktor für ein Rechteck mit Koordinaten, Seitenlängen und grafischen Eigenschaften.
      */
-    constructor(processing: PApplet, x: Float, y: Float, side_a: Float, side_b: Float, color: Int, borderColor: Int, fillColor: Int)
+    constructor(processing: PApplet, x: Float, y: Float, sideA: Float, sideB: Float, color: Int, borderColor: Int, fillColor: Int)
             : super(processing, x, y, color, borderColor, fillColor) {
-        this.side_a = side_a
-        this.side_b = side_b
+        this.sideA = sideA
+        this.sideB = sideB
     }
 
     /**
@@ -22,15 +22,15 @@ internal open class Rectangle : Form {
      */
     constructor(processing: PApplet) : super(processing) {
         val rand = Random
-        this.side_a = rand.nextFloat() * 100 + 30
-        this.side_b = rand.nextFloat() * 60 + 20
+        this.sideA = rand.nextFloat() * 100 + 30
+        this.sideB = rand.nextFloat() * 60 + 20
     }
 
     /**
      * Berechnet die Fläche des Rechtecks.
      */
     override fun countArea(): Float {
-        return side_a * side_b
+        return sideA * sideB
     }
 
     /**
@@ -41,21 +41,54 @@ internal open class Rectangle : Form {
             stroke(borderColor)
             strokeWeight(borderWidth)
             fill(fillColor)
-            rect(x, y, side_a, side_b)
+            rect(x, y, sideA, sideB)
         }
     }
 
     override fun showAtts() {
         super.showAtts()
-        println("Length: $side_a\nWidth: $side_b")
+        println("Length: $sideA\nWidth: $sideB")
     }
     override fun getBounds(): Bounds {
         return Bounds(
             x,
-            x + side_a,
+            x + sideA,
             y,
-            y + side_b
+            y + sideB
         )
     }
 
+    /**
+     *  Überschriebene Methode zur Größenänderung.
+     *
+     * Behandelt jede Grenze des Vierecks einzeln.
+     */
+    override fun resize(handle: ResizeHandle, dx: Float, dy: Float) {
+        when (handle) {
+            ResizeHandle.BOTTOM_RIGHT -> {
+                sideA = (sideA + dx).coerceAtLeast(20f)
+                sideB = (sideB + dy).coerceAtLeast(20f)
+            }
+            ResizeHandle.BOTTOM_LEFT -> {
+                val oldWidth = sideA
+                sideA = (sideA - dx).coerceAtLeast(20f)
+                x += oldWidth - sideA
+                sideB = (sideB + dy).coerceAtLeast(20f)
+            }
+            ResizeHandle.TOP_RIGHT -> {
+                sideA = (sideA + dx).coerceAtLeast(20f)
+                val oldHeight = sideB
+                sideB = (sideB - dy).coerceAtLeast(20f)
+                y += oldHeight - sideB
+            }
+            ResizeHandle.TOP_LEFT -> {
+                val oldWidth = sideA
+                val oldHeight = sideB
+                sideA = (sideA - dx).coerceAtLeast(20f)
+                sideB = (sideB - dy).coerceAtLeast(20f)
+                x += oldWidth - sideA
+                y += oldHeight - sideB
+            }
+        }
+    }
 }

@@ -3,10 +3,17 @@ import processing.core.PApplet
 var window_width=800
 var window_height=600
 
-//Hauptklasse für Processing
+/**
+ * Hauptklasse der Anwendung.
+ * Verwaltet das Hauptfenster und die Benutzerinteraktionen mittels Processing.
+ */
 class Main : PApplet() {
     private lateinit var formManager: FormManager
 
+    /**
+     * Initialisiert die Fenstereinstellungen.
+     * Setzt die Fenstergröße auf die definierten Maße.
+     */
     override fun settings() {
         size(window_width, window_height)
     }
@@ -18,6 +25,16 @@ class Main : PApplet() {
         printInstructions()
     }
 
+    /**
+     * Behandelt Tastatureingaben.
+     * Unterstützt folgende Befehle:
+     * - 'k': Erstellt einen Kreis
+     * - 'q': Erstellt ein Quadrat
+     * - 'v': Erstellt ein Rechteck
+     * - 'r/R', 'g/G', 'b/B': Ändert die Farbkomponenten
+     * - '0-9': Ändert die Randstärke
+     * - DELETE/BACKSPACE: Löscht ausgewählte Formen
+     */
     override fun keyPressed() {
         when (key) {
             'k', 'q', 'v' -> formManager.createForm(key)
@@ -37,6 +54,10 @@ class Main : PApplet() {
         }
     }
 
+    /**
+     * Behandelt Mausklick-Ereignisse.
+     * Berechnet den Skalierungsfaktor für die korrekte Positionierung der Elemente.
+     */
     override fun mouseClicked() {
         val scaleX = width.toFloat() / window_width
         val scaleY = height.toFloat() / window_height
@@ -45,6 +66,11 @@ class Main : PApplet() {
 
     }
 
+    /**
+     * Behandelt das Drücken der Maustaste.
+     * Ermöglicht die Auswahl von Formen und initiiert Größenänderungs- oder Bewegungsoperationen.
+     * Mit gedrückter SHIFT-Taste können mehrere Formen ausgewählt werden.
+     */
     override fun mousePressed() {
         val scaleX = width.toFloat() / window_width
         val scaleY = height.toFloat() / window_height
@@ -53,6 +79,12 @@ class Main : PApplet() {
         formManager.handleMousePress(mouseX.toFloat(), mouseY.toFloat(), scale)
     }
 
+    /**
+     * Behandelt das Ziehen der Maus.
+     * Ermöglicht das Verschieben ausgewählter Formen oder deren Größenänderung,
+     * abhängig davon, ob ein Größenänderungsgriff aktiv ist.
+     * Die Position der Formen wird auf den sichtbaren Fensterbereich beschränkt.
+     */
     override fun mouseDragged() {
         val scaleX = width.toFloat() / window_width
         val scaleY = height.toFloat() / window_height
@@ -64,6 +96,11 @@ class Main : PApplet() {
         formManager.handleDrag(dx, dy, mouseX.toFloat(), mouseY.toFloat(), scale, window_width, window_height)
     }
 
+    /**
+     * Behandelt das Loslassen der Maustaste.
+     * Beendet aktuelle Größenänderungs- oder Bewegungsoperationen.
+     * Bei einem einfachen Klick ohne Bewegung wird die Auswahl der Form umgeschaltet.
+     */
     override fun mouseReleased() {
         formManager.handleMouseRelease()
     }
@@ -92,9 +129,13 @@ class Main : PApplet() {
 
 
 /**
- * Quadratische Grenzen eines Forms
+ * Datenklasse zur Darstellung der Grenzen einer Form.
+ *
+ * @property left Linke Grenze
+ * @property right Rechte Grenze
+ * @property top Obere Grenze
+ * @property bottom Untere Grenze
  */
-
 data class Bounds(
     val left: Float,
     val right: Float,
