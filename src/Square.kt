@@ -8,11 +8,6 @@ import kotlin.random.Random
  */
 
 internal class Square : Rectangle {
-    /**
-     * Konstruktor für ein Quadrat mit Koordinaten, Seitenlänge und grafischen Eigenschaften.
-     */
-    constructor(processing: PApplet, x: Float, y: Float, side: Float, color: Int, borderColor: Int, fillColor: Int)
-            : super(processing, x, y, side, side, color, borderColor, fillColor)
 
     /**
      * Standardkonstruktor für ein Quadrat mit randomen Werten

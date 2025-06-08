@@ -9,15 +9,6 @@ internal open class Rectangle : Form {
     var sideB = 0.0f
 
     /**
-     * Konstruktor für ein Rechteck mit Koordinaten, Seitenlängen und grafischen Eigenschaften.
-     */
-    constructor(processing: PApplet, x: Float, y: Float, sideA: Float, sideB: Float, color: Int, borderColor: Int, fillColor: Int)
-            : super(processing, x, y, color, borderColor, fillColor) {
-        this.sideA = sideA
-        this.sideB = sideB
-    }
-
-    /**
      * Standardkonstruktor für ein Rechteck mit randomen Werten und grafischen Eigenschaften
      */
     constructor(processing: PApplet) : super(processing) {

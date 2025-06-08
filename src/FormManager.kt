@@ -84,13 +84,10 @@ class FormManager(private val processing: PApplet) {
      *
      * @param dx Horizontale Bewegung der Maus
      * @param dy Vertikale Bewegung der Maus
-     * @param mouseX Aktuelle X-Position der Maus
-     * @param mouseY Aktuelle Y-Position der Maus
-     * @param scale Aktueller Skalierungsfaktor
      * @param windowWidth Fensterbreite
      * @param windowHeight Fensterhöhe
      */
-    fun handleDrag(dx: Float, dy: Float, mouseX: Float, mouseY: Float, scale: Float, windowWidth: Int, windowHeight: Int) {
+    fun handleDrag(dx: Float, dy: Float, windowWidth: Int, windowHeight: Int) {
         if (resizingForm != null && activeResizeHandle != null) {
             resizingForm?.resize(activeResizeHandle!!, dx, dy)
             resizingForm?.constrainToWindow(windowWidth, windowHeight)
@@ -171,9 +168,8 @@ class FormManager(private val processing: PApplet) {
     /**
      * Zeichnet alle Formen und markiert die ausgewählten Formen.
      *
-     * @param scale Aktueller Skalierungsfaktor für die korrekte Darstellung
      */
-    fun drawForms(scale: Float) {
+    fun drawForms() {
         forms.forEach { it?.draw() }
         selectedForms.forEach { it.drawSelectionHighlight() }
     }

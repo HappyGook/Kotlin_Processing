@@ -55,18 +55,6 @@ class Main : PApplet() {
     }
 
     /**
-     * Behandelt Mausklick-Ereignisse.
-     * Berechnet den Skalierungsfaktor für die korrekte Positionierung der Elemente.
-     */
-    override fun mouseClicked() {
-        val scaleX = width.toFloat() / window_width
-        val scaleY = height.toFloat() / window_height
-        val scale = minOf(scaleX, scaleY)
-
-
-    }
-
-    /**
      * Behandelt das Drücken der Maustaste.
      * Ermöglicht die Auswahl von Formen und initiiert Größenänderungs- oder Bewegungsoperationen.
      * Mit gedrückter SHIFT-Taste können mehrere Formen ausgewählt werden.
@@ -93,7 +81,7 @@ class Main : PApplet() {
         val dx = (mouseX - pmouseX) / scale
         val dy = (mouseY - pmouseY) / scale
 
-        formManager.handleDrag(dx, dy, mouseX.toFloat(), mouseY.toFloat(), scale, window_width, window_height)
+        formManager.handleDrag(dx, dy,  window_width, window_height)
     }
 
     /**
@@ -109,9 +97,6 @@ class Main : PApplet() {
      * Überprüft, in welcher Richtung gescrollt wird und davon abhängig wird Delta positiv oder negativ.
      */
     override fun mouseWheel(event: processing.event.MouseEvent) {
-        val scaleX = width.toFloat() / window_width
-        val scaleY = height.toFloat() / window_height
-        val scale = minOf(scaleX, scaleY)
 
         val delta = if (event.count > 0) 5f else -5f
 
@@ -127,7 +112,7 @@ class Main : PApplet() {
 
         pushMatrix()
         scale(scale)
-        formManager.drawForms(scale)
+        formManager.drawForms()
         popMatrix()
     }
 

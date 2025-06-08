@@ -9,14 +9,6 @@ internal class Round : Form {
     var radius = 0.0f // Radius des Kreises
 
     /**
-     * Konstruktor für einen Kreis mit Koordinaten, Radius und grafischen Eigenschaften.
-     */
-    constructor(processing: PApplet, x: Float, y: Float, radius: Float, color: Int, borderColor: Int, fillColor: Int)
-            : super(processing, x, y, color, borderColor, fillColor) {
-        this.radius = radius
-    }
-
-    /**
      * Standardkonstruktor für einen Kreis mit randomen Werten und grafischen Eigenschaften
      */
     constructor(processing: PApplet) : super(processing) {
