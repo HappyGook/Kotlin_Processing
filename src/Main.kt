@@ -47,6 +47,10 @@ class Main : PApplet() {
             '0','1','2','3','4','5','6','7','8','9' -> {
                 formManager.adjustSelectedFormsBorder(key.code.toFloat()-48)
             }
+            '!'->{
+                println("Schreiben Sie Name der Datei, die gespeichert oder geladen werden soll:")
+                formManager.handleSaveLoadCommand()
+            }
         }
 
         if (keyCode.toChar() == DELETE || keyCode.toChar() == BACKSPACE) {

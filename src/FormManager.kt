@@ -1,4 +1,7 @@
 import processing.core.PApplet
+import java.io.File
+import java.io.IOException
+import java.text.ParseException
 
 /**
  * Verwaltet die Formen in der Anwendung.
@@ -17,6 +20,8 @@ class FormManager(private val processing: PApplet) {
     private var activeResizeHandle: Form.ResizeHandle? = null
     private var resizingForm: Form? = null
     private var draggingForm: Form? = null
+    private val formSaver = FormSaver(processing)
+    private var isWaitingForInput = false
 
     /**
      * Erstellt eine neue Form
@@ -185,6 +190,47 @@ class FormManager(private val processing: PApplet) {
     /**
      * Formen Speichern
      */
+    fun handleSaveLoadCommand(){
+        if(isWaitingForInput){
+            println("Bitte erst die Eingabe abschließen!")
+            return
+        }
+
+        isWaitingForInput=true
+
+        //Damit der Hauptthread nicht beendet wird, wird ein neuer Thread erstellt
+        Thread{
+            try{
+                val filename=readln()
+                isWaitingForInput=false
+
+                if(File(filename).exists()){
+                    try{
+                        val loadedForms=formSaver.loadFormsFromFile(filename)
+                        forms.clear()
+                        forms.addAll(loadedForms)
+                        println("Datei $filename erfolgreich geladen!")
+                    } catch (e: IOException){
+                        println("Fehler beim Laden der Datei $filename! ${e.message}")
+                    } catch (e: ParseException){
+                        throw e
+                    }
+                } else {
+                    try{
+                        formSaver.saveFormsToFile(forms, filename)
+                        println("Datei $filename erfolgreich gespeichert!")
+                    } catch (e: IOException){
+                        println("Fehler beim Speichern der Datei $filename! ${e.message}")
+                    } catch (e: ParseException){
+                        throw e
+                    }
+                }
+            } catch (e: Exception){
+                isWaitingForInput = false
+                println("Fehler beim Verarbeiten der Eingabe! ${e.message}")
+            }
+        }.start()
+    }
 }
 
 
