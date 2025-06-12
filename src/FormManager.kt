@@ -183,7 +183,7 @@ class FormManager(private val processing: PApplet) {
     }
 
     /**
-     * Größenänderungen den verschiedenen Formen.
+     * Formen Speichern
      */
 }
 
