@@ -4,8 +4,20 @@ import java.text.ParseException
 import processing.core.PApplet
 import kotlin.jvm.Throws
 
-
+/**
+ * Verwaltet das Speichern und Laden von Formen in bzw. aus Dateien.
+ * Unterstützt die Formate: Round, Square und Rectangle.
+ *
+ * @property processing Die Processing-Instanz zur Farberzeugung bei Bedarf.
+ */
 class FormSaver(private val processing: PApplet) {
+    /**
+     * Speichert die übergebene Liste von Formen in einer Datei.
+     *
+     * @param forms Liste der zu speichernden Formen
+     * @param filename Name der Zieldatei
+     * @throws IOException Wenn ein Fehler beim Schreiben in die Datei auftritt
+     */
     @Throws(IOException::class)
     fun saveFormsToFile(forms: List<Form?>, filename: String){
         File(filename).printWriter().use { out ->
@@ -21,6 +33,14 @@ class FormSaver(private val processing: PApplet) {
         }
     }
 
+    /**
+     * Lädt Formen aus einer Datei und gibt sie als Liste zurück.
+     *
+     * @param filename Name der Quelldatei
+     * @return Liste der geladenen Formen
+     * @throws IOException Wenn ein Fehler beim Lesen der Datei auftritt
+     * @throws ParseException Wenn das Dateiformat ungültig oder unvollständig ist
+     */
     @Throws(IOException::class, ParseException::class)
     fun loadFormsFromFile(filename: String): List<Form>{
         val forms = mutableListOf<Form>()
