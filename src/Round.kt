@@ -6,7 +6,12 @@ import kotlin.random.Random
  * Repräsentiert einen Kreis.
  */
 internal class Round : Form {
-    var radius = 0.0f // Radius des Kreises
+    private var _radius = 0.0f
+    var radius: Float
+        get() = _radius
+        set(value) {
+            _radius = value.coerceAtLeast(10f)
+        }
 
     /**
      * Standardkonstruktor für einen Kreis mit randomen Werten und grafischen Eigenschaften

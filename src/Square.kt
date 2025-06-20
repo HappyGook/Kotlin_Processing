@@ -15,9 +15,29 @@ internal class Square : Rectangle {
     constructor(processing: PApplet) : super(processing) {
         val rand = Random
         val side = rand.nextFloat() * 80 + 20
-        sideA = side
-        sideB = side
+        this.side = side
     }
+
+
+    /**
+     * Sicherstellen, dass die Seiten des Quadrats immer die gleiche Länge haben
+     */
+    override var sideA: Float
+        get() = super.sideA
+        set(value) {
+            val validValue = value.coerceAtLeast(20f)
+            super.sideA = validValue
+            super.sideB = validValue
+        }
+
+    override var sideB: Float
+        get() = super.sideB
+        set(value) {
+            val validValue = value.coerceAtLeast(20f)
+            super.sideA = validValue
+            super.sideB = validValue
+        }
+
 
     var side: Float
         get() = sideA

@@ -5,13 +5,64 @@ import kotlin.random.Random
  * Superklasse für alle Formen. Enthält gemeinsame Attribute und Methoden, die dann überschrieben werden
  */
 abstract class Form {
-    var x = 0.0f
-    var y = 0.0f
-    var color = color(255, 255, 255)
-    var borderColor = color(0, 0, 0)
-    var fillColor = color(128, 128, 128)
-    var borderWidth = 1f
+    private var _x = 0.0f
+    private var _y = 0.0f
+    private var _color = color(255, 255, 255)
+    private var _borderColor = color(0, 0, 0)
+    private var _fillColor = color(128, 128, 128)
+    private var _borderWidth = 1f
     protected var processing: PApplet
+        private set  // Zugriff möglich, aber kein Überschreiben
+
+
+    var x: Float
+        get() = _x
+        set(value) {
+            _x = value.coerceAtLeast(0f)
+        }
+
+    var y: Float
+        get() = _y
+        set(value) {
+            _y = value.coerceAtLeast(0f)
+        }
+
+    var borderWidth: Float
+        get() = _borderWidth
+        set(value) {
+            _borderWidth = value.coerceIn(0f, 10f)
+        }
+
+    var color: Int
+        get() = _color
+        set(value) {
+            _color = validateColor(value)
+        }
+
+    var borderColor: Int
+        get() = _borderColor
+        set(value) {
+            _borderColor = validateColor(value)
+        }
+
+    var fillColor: Int
+        get() = _fillColor
+        set(value) {
+            _fillColor = validateColor(value)
+        }
+
+    // Validierung der Farbe
+    private fun validateColor(color: Int): Int {
+        val r = (color shr 16) and 0xFF
+        val g = (color shr 8) and 0xFF
+        val b = color and 0xFF
+        return processing.color(
+            r.coerceIn(0, 255),
+            g.coerceIn(0, 255),
+            b.coerceIn(0, 255)
+        )
+    }
+
 
     /**
      * Konstruktor für die Form mit gegebenen Koordinaten und grafischen Eigenschaften.
@@ -31,12 +82,21 @@ abstract class Form {
     constructor(processing: PApplet) {
         this.processing = processing
         val rand = Random
-        this.x = rand.nextFloat() * processing.width
-        this.y = rand.nextFloat() * processing.height
-        this.color = getRandomColor(processing)
-        this.borderColor = getRandomColor(processing)
-        this.fillColor = getRandomColor(processing)
+        this.x = rand.nextFloat() * processing.width.coerceAtLeast(0)
+        this.y = rand.nextFloat() * processing.height.coerceAtLeast(0)
+        this.fillColor = getRandomValidColor(processing)
+        this.borderColor = getRandomValidColor(processing)
+        this.borderWidth = rand.nextFloat() * 5 + 1
     }
+
+    private fun getRandomValidColor(p: PApplet): Int {
+        return p.color(
+            Random.nextInt(256).coerceIn(0, 255),
+            Random.nextInt(256).coerceIn(0, 255),
+            Random.nextInt(256).coerceIn(0, 255)
+        )
+    }
+
 
     /**
     * Prüft, ob sich der Mauszeiger über der Form befindet.
@@ -87,7 +147,10 @@ abstract class Form {
      * Zeichnet die Auswahlhervorhebung um die Form.
      * Zeigt einen blauen Rahmen und Griffe an den Ecken.
      */
-    protected val handleSize = 8f
+    protected var handleSize: Float = 8f
+        private set(value) {
+            field = value.coerceIn(4f, 16f)
+        }
     open fun drawSelectionHighlight() {
         processing.apply {
             pushStyle()

@@ -5,8 +5,23 @@ import kotlin.random.Random
  * Repräsentiert ein Rechteck.
  */
 internal open class Rectangle : Form {
-    var sideA = 0.0f
-    var sideB = 0.0f
+    private var _sideA = 0.0f
+    private var _sideB = 0.0f
+
+    /**
+     * Validierung der Seiten
+     */
+    open var sideA: Float
+        get() = _sideA
+        set(value) {
+            _sideA = value.coerceAtLeast(20f)
+        }
+
+    open var sideB: Float
+        get() = _sideB
+        set(value) {
+            _sideB = value.coerceAtLeast(20f)
+        }
 
     /**
      * Standardkonstruktor für ein Rechteck mit randomen Werten und grafischen Eigenschaften
